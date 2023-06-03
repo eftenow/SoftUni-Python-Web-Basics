@@ -24,3 +24,5 @@ class Pet(models.Model):
     def __str__(self):
         return self.name
 
+    def pet_photo_count(self, manager='photo_set'):
+        return getattr(self, manager).count()
