@@ -6,7 +6,7 @@ from petstagram.photos.validators import validate_file_size
 
 
 class Photo(models.Model):
-    photo = models.FileField(validators=[validate_file_size])
+    photo = models.ImageField(upload_to='images', validators=[validate_file_size])
     description = models.CharField(
         null=True,
         blank=True,

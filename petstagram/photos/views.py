@@ -1,11 +1,18 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 
 from petstagram.common.views import photo_likes_count, user_already_liked_photo
+from petstagram.photos.forms import CreatePhotoForm, EditPhotoForm
 from petstagram.photos.models import Photo
 
 
 def add_photo(request):
-    return render(request, template_name='photo-add-page.html')
+    form = CreatePhotoForm(request.POST or None, request.FILES or None)
+    if form.is_valid():
+        form.save()
+        return redirect('display home')
+
+    context = {'form': form}
+    return render(request, template_name='photo-add-page.html', context=context)
 
 
 def details_photo(request, pk):
@@ -25,6 +32,19 @@ def details_photo(request, pk):
 
 
 def edit_photo(request, pk):
-    return render(request, template_name='photo-edit-page.html')
+    photo = Photo.objects.filter(pk=pk).get()
+    form = EditPhotoForm(request.POST or None, instance=photo)
+    if form.is_valid():
+        form.save()
+        return redirect('photo details', pk=pk)
+
+    context = {'form': form}
+    return render(request, template_name='photo-edit-page.html', context=context)
+
+
+def delete_photo(request, pk):
+    photo = Photo.objects.filter(pk=pk).get()
+    photo.delete()
+    return redirect('display home')
 
 
