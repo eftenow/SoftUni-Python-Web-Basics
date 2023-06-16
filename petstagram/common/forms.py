@@ -12,5 +12,16 @@ class CommentForm(forms.ModelForm):
                 'placeholder': 'Add comment...',
                 'cols': 40,
                 'rows': 10
-                                                  })
+            })
         }
+
+
+class SearchForm(forms.Form):
+    pet_name = forms.CharField(
+        max_length=50,
+        widget=forms.TextInput(
+            attrs={
+                'placeholder': 'Search by pet name...'
+            }
+        )
+    )

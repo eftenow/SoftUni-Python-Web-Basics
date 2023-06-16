@@ -2,7 +2,7 @@ from django.shortcuts import render, redirect, resolve_url
 from django.urls import reverse
 from pyperclip import copy
 
-from petstagram.common.forms import CommentForm
+from petstagram.common.forms import CommentForm, SearchForm
 from petstagram.common.models import PhotoLike, PhotoComment
 from petstagram.photos.models import Photo
 
@@ -18,13 +18,22 @@ def user_already_liked_photo(photo):
 
 
 def display_home(request):
-    photos = [photo_likes_count(photo) for photo in Photo.objects.all()]
+    photos = Photo.objects.all()
+    search_form = SearchForm()
+
+    if request.method == 'POST':
+        search_form = SearchForm(request.POST)
+        if search_form.is_valid():
+            photos = photos.filter(tagged_pets__name__icontains=search_form.cleaned_data['pet_name'])
+
+    photos = [photo_likes_count(photo) for photo in photos]
     photos = [user_already_liked_photo(photo) for photo in photos]
     comment_form = CommentForm()
 
     context = {
         'photos': photos,
-        'comment_form': comment_form
+        'comment_form': comment_form,
+        'search_form': search_form
     }
 
     return render(request, template_name='home-page.html', context=context)
@@ -60,5 +69,3 @@ def add_comment_functionality(request, photo_id):
             comment.save()
 
         return redirect(request.META['HTTP_REFERER'] + f'#{photo_id}')
-
-
