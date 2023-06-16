@@ -14,3 +14,5 @@ class PhotoComment(models.Model):
 
 class PhotoLike(models.Model):
     to_photo = models.ForeignKey(Photo, on_delete=models.CASCADE)
+
+

@@ -15,7 +15,7 @@
             <!-- End Searchbar Form -->
 
             {% for photo in photos %}
-            <div class="card">
+                <div class="card">
                 <div class="top">
                     <div class="userDetails">
                         <!-- Link to User Profile Page -->
@@ -56,13 +56,13 @@
                             <span class="heart">
 									<a href="{% url 'like photo' photo.id %}">
 										{% if photo.user_liked %}
-										<svg style="color: red"
-                                             xmlns="http://www.w3.org/2000/svg"
-                                             width="24"
-                                             height="24"
-                                             fill="currentColor"
-                                             class="bi bi-heart-fill"
-                                             viewBox="0 0 16 16">
+                                            <svg style="color: red"
+                                                 xmlns="http://www.w3.org/2000/svg"
+                                                 width="24"
+                                                 height="24"
+                                                 fill="currentColor"
+                                                 class="bi bi-heart-fill"
+                                                 viewBox="0 0 16 16">
                                             <!-- Coordinate path -->
                                             <path fill-rule="evenodd"
                                                   d="M8 1.314C12.438-3.248 23.534 4.735
@@ -71,14 +71,14 @@
 
                                             </path>
                                         </svg>
-                                            {% else %}
+                                        {% else %}
                                             <svg aria-label="Like"
-                                             color="#262626"
-                                             fill="#262626"
-                                             height="24"
-                                             role="img"
-                                             viewBox="0 0 48 48"
-                                             width="24">
+                                                 color="#262626"
+                                                 fill="#262626"
+                                                 height="24"
+                                                 role="img"
+                                                 viewBox="0 0 48 48"
+                                                 width="24">
                                         <!-- Coordinate path -->
                                         <path d="M34.6 6.1c5.7 0 10.4 5.2 10.4
                                                     11.5 0 6.8-5.9 11-11.5 16S25 41.3 24
@@ -94,7 +94,7 @@
                                                     48 25 48 17.6c0-8-6-14.5-13.4-14.5z">
                                         </path>
                                     </svg>
-										{% endif %}
+                                        {% endif %}
 
 
 								</a>
@@ -129,10 +129,10 @@
 
                     {% for pet in photo.tagged_pets.all %}
                         <a href="{% url 'pet details' username='Test-username' pet_slug=pet.slug %}">
-                        <p class="message">
-                            <b>{{ pet.name }}</b>
-                        </p>
-                    </a>
+                            <p class="message">
+                                <b>{{ pet.name }}</b>
+                            </p>
+                        </a>
                     {% endfor %}
 
 
@@ -144,6 +144,33 @@
                     <!-- Date of Publication -->
                     <h5 class="postTime">{{ photo.date_of_publication }}</h5>
 
+                    {% for photo_comment in photo.photocomment_set.all %}
+                        <div class="comments">
+                        <div class="top">
+                            <div class="userDetails">
+                                <div class="comment-data">
+                                    <div class="profilepic">
+                                        <div class="profile_img">
+                                            <div class="image">
+                                                <!-- User Profile Image -->
+                                                <img src='{% static "/images/person.png" %}' alt="img8">
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <p>
+                                        <!-- Link to User Profile Details Page-->
+                                        <!-- User First and/or Last Name or username-->
+                                        <a href="">Steven Ivanov</a>
+                                        <!-- User Comment -->
+                                        {{ photo_comment.comment_text }}
+                                    </p>
+                                </div>
+                                <span>{{ photo_comment.date_time_of_publication }}</span>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+
                     <!-- Start Add Comments Section -->
                     <div class="addComments">
                         <div class="reaction">
@@ -152,11 +179,10 @@
                             </h3>
                         </div>
                         <!-- Start Add Comments Form -->
-                        <form method="post" action="#">
-                            <label for="id_body">Body:</label>
-                            <textarea name="body" cols="40" rows="10" placeholder="Add comment..." maxlength="300"
-                                      required="" id="id_body"></textarea>
+                        <form method="post" action="{% url 'add comment' photo.id %}">
+                            {{ comment_form.as_p }}
                             <button type="submit">Post</button>
+                            {% csrf_token %}
                         </form>
                         <!-- End Add Comments Form -->
 
@@ -164,10 +190,9 @@
                     <!-- End Add Comments Section -->
 
                 </div>
-
             {% endfor %}
-</div></div>
-
+            </div>
+        </div>
 
 
     </div>

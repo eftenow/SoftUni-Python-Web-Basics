@@ -1,5 +1,7 @@
 from django.shortcuts import render, redirect
 
+from petstagram.common.forms import CommentForm
+from petstagram.common.views import photo_likes_count, user_already_liked_photo
 from petstagram.pets.forms import CreatePetForm, EditPetForm, DeletePetForm
 from petstagram.pets.models import Pet
 
@@ -34,9 +36,13 @@ def delete_pet(request, username, pet_slug):
 def details_pet(request, username, pet_slug):
     pet = Pet.objects.get(slug=pet_slug)
     photos = pet.photo_set.all()
+    comment_form = CommentForm()
     context = {
         'pet': pet,
-        'pet_photos': photos
+        'pet_photos': photos,
+        'comment_form': comment_form,
+        'photo_likes': photo_likes_count,
+        'photo_liked': user_already_liked_photo
     }
 
     return render(request, template_name='pet-details-page.html', context=context)
@@ -44,7 +50,6 @@ def details_pet(request, username, pet_slug):
 
 def edit_pet(request, username, pet_slug):
     pet = Pet.objects.filter(slug=pet_slug).get()
-    print(pet)
 
     if request.method == 'GET':
         form = EditPetForm(instance=pet)
