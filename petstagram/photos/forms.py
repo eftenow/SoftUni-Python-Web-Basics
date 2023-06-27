@@ -6,7 +6,7 @@ from petstagram.photos.models import Photo
 class CreatePhotoForm(forms.ModelForm):
     class Meta:
         model = Photo
-        fields = '__all__'
+        exclude = ['user']
 
 
 class EditPhotoForm(forms.ModelForm):

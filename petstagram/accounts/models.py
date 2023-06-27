@@ -12,12 +12,17 @@ from petstagram.accounts.validators import name_contains_only_letters
 
 class PetstagramUser(AbstractBaseUser, PermissionsMixin):
     email = models.EmailField(unique=True)
+    username = models.CharField(unique=True)
     date_joined = models.DateTimeField(auto_now_add=True)
     is_staff = models.BooleanField(default=False)
 
-    USERNAME_FIELD = "email"
+    USERNAME_FIELD = "username"
 
     objects = AppUserManager()
+
+    # def delete(self, using=None, keep_parents=False):
+    #     self.profile.delete()
+    #     super().delete()
 
 
 class Profile(models.Model):
@@ -49,3 +54,13 @@ class Profile(models.Model):
         on_delete=models.CASCADE,
         primary_key=True
     )
+
+    def get_full_name(self):
+        if self.first_name and self.last_name:
+            return f'{self.first_name} {self.last_name}'
+        elif self.first_name:
+            return self.first_name
+        elif self.last_name:
+            return self.last_name
+        else:
+            return self.user.username

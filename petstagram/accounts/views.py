@@ -1,22 +1,84 @@
+from django import forms
+from django.contrib.auth import get_user_model, login, authenticate
+from django.contrib.auth.views import LoginView, LogoutView
+from django.http import HttpResponseRedirect
 from django.shortcuts import render
+from django.urls import reverse_lazy
+from django.views.generic import CreateView, UpdateView, DetailView, DeleteView
+
+from petstagram.accounts.forms import CreateProfileForm, LoginProfileForm, EditUserForm
+
+UserModel = get_user_model()
 
 
-def login_account(request):
-    return render(request, template_name='login-page.html')
+class ProfileDeleteView(DeleteView):
+    template_name = 'profile-delete-page.html'
+    model = UserModel
+    success_url = reverse_lazy('display home')
+
+    def post(self, request, *args, **kwargs):
+        self.request.user.delete()
+        return HttpResponseRedirect(self.success_url)
 
 
-def delete_account(request, pk):
-    return render(request, template_name='profile-delete-page.html')
+
+class UserDetailsView(DetailView):
+    template_name = 'profile-details-page.html'
+    model = UserModel
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data()
+        total_likes_count = sum([p.likes.count() for p in self.object.photo_set.all()])
+        context['total_likes'] = total_likes_count
+        return context
 
 
-def details_account(request, pk):
-    return render(request, template_name='profile-details-page.html')
+
+class SignOutView(LogoutView):
+    next_page = reverse_lazy('display home')
 
 
-def edit_account(request, pk):
-    return render(request, template_name='profile-edit-page.html')
+class EditUserView(UpdateView):
+    template_name = 'profile-edit-page.html'
+    form_class = EditUserForm
+    model = UserModel
+
+    def form_valid(self, form):
+        response = super().form_valid(form)
+
+        profile = self.object.profile  # Works because there is a OneToOneField relationship  UserModel and Profile
+        profile.first_name = form.cleaned_data['first_name']
+        profile.last_name = form.cleaned_data['last_name']
+        profile.profile_picture = form.cleaned_data['profile_picture']
+        profile.gender = form.cleaned_data['gender']
+        profile.save()
+
+        return response
+
+    def get_success_url(self):
+        return reverse_lazy('account details', kwargs={'pk': self.object.pk})
 
 
-def register_account(request):
-    return render(request, template_name='register-page.html')
+class SignUpView(CreateView):
+    template_name = 'register-page.html'
+    form_class = CreateProfileForm
 
+    def get_success_url(self):
+        # Provide a valid URL to redirect to
+        return reverse_lazy('display home')
+
+    def form_valid(self, form):
+        response = super().form_valid(form)
+        user = authenticate(
+            self.request,
+            username=form.cleaned_data['username'],
+            password=form.cleaned_data['password1']
+        )
+        login(self.request, user)
+        return response
+
+
+class SignInView(LoginView):
+    template_name = 'login-page.html'
+    form_class = LoginProfileForm
+    success_url = reverse_lazy('display home')

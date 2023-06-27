@@ -1,5 +1,6 @@
 {% extends 'base.html' %}
 {% load static %}
+{% load get_user_fullname %}
 
 {% block content %}
 
@@ -14,45 +15,45 @@
                     <div class="userDetails">
 
                         <!-- Link to User Profile Details Page-->
-                        <a href="#">
+                        <a href="{% url 'account details' photo.user_id %}">
                             <div class="profilepic">
                                 <div class="profile_img">
                                     <div class="image">
-                                        <img src="{% static 'images/person.png' %}" alt="img8">
+                                        {% if photo.user.profile.profile_picture %}
+                                            <img src="{{ photo.user.profile.profile_picture }}" alt="img8">
+
+                                        {% else %}
+                                            <img src="{% static 'images/person.png' %}" alt="img8">
+
+                                        {% endif %}
                                     </div>
                                 </div>
                             </div>
                         </a>
                         <h3>
 
-                            <!-- Link to User Profile Details Page -->
-                            <a href="#">
-                                <!-- IF user has first name and last name -->
-                                Diyan Kalaydzhiev
-                                <!-- else -->
-                                <!-- show user username -->
+                            <a href="{% url 'account details' photo.user_id %}">
+                                {{ photo.user_id|get_username_or_full_name }}
                             </a>
                             <br>
 
                             <!-- IF the photo has location -->
-                            <span>{{ photo.location }}</span>
+                            {% if photo.location %}
+                                <span>{{ photo.location }}</span>
+                            {% endif %}
 
-                            <!-- IF the viewer is the creator of the photo -->
-                            <div class="edit-delete-btns">
-
-                                <!-- Link to Edit Pet Photo Page -->
-                                <a href="{% url 'photo edit' photo.id %}">
-                                    <img class="edit-img" src='{% static "/images/edit-pen-icon-6.jpg" %}'
-                                         alt="edit button">
-                                </a>
-
-                                <!-- Link to Delete Pet Photo Page -->
-                                <a href="{% url 'photo delete' photo.id %}">
-                                    <img class="bin-img" src='{% static "/images/icon-remove-22.jpg" %}'
-                                         alt="bin button">
-                                </a>
-                            </div>
-                            <!-- End IF the viewer is the creator of the photo -->
+                            {% if is_owner %}
+                                <div class="edit-delete-btns">
+                                    <a href="{% url 'photo edit' photo.id %}">
+                                        <img class="edit-img" src='{% static "/images/edit-pen-icon-6.jpg" %}'
+                                             alt="edit button">
+                                    </a>
+                                    <a href="{% url 'photo delete' photo.id %}">
+                                        <img class="bin-img" src='{% static "/images/icon-remove-22.jpg" %}'
+                                             alt="bin button">
+                                    </a>
+                                </div>
+                            {% endif %}
 
                         </h3>
                     </div>
@@ -142,7 +143,7 @@
                     <!-- End Like and Share Buttons Section -->
 
                     <!-- Number of Likes for the Photo -->
-                    <p class="likes">{{ photo.likes_count }} likes</p>
+                    <p class="likes">{{ photo_likes }} likes</p>
 
                     <!-- Start Tagged Pets Section-->
                     <!-- Link to First Tagged Pet Details Page -->

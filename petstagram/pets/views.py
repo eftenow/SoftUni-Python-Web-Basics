@@ -1,3 +1,5 @@
+from django.urls import reverse_lazy
+from django.views.generic import CreateView, DetailView
 from django.shortcuts import render, redirect
 
 from petstagram.common.forms import CommentForm
@@ -6,21 +8,17 @@ from petstagram.pets.forms import CreatePetForm, EditPetForm, DeletePetForm
 from petstagram.pets.models import Pet
 
 
-def add_pet(request):
-    form = None
+class AddPetView(CreateView):
+    template_name = 'pet-add-page.html'
+    form_class = CreatePetForm
 
-    if request.method == 'GET':
-        form = CreatePetForm()
-    elif request.method == 'POST':
-        form = CreatePetForm(request.POST)
-        if form.is_valid():
-            form.save()
-            return redirect('account details', pk=1)
+    def get_success_url(self):
+        return reverse_lazy('display home')
 
-    context = {
-        'form': form
-    }
-    return render(request, template_name='pet-add-page.html', context=context)
+    def form_valid(self, form):
+        form.instance.user = self.request.user
+
+        return super().form_valid(form)
 
 
 def delete_pet(request, username, pet_slug):
@@ -33,19 +31,18 @@ def delete_pet(request, username, pet_slug):
     return render(request, template_name='pet-delete-page.html', context=context)
 
 
-def details_pet(request, username, pet_slug):
-    pet = Pet.objects.get(slug=pet_slug)
-    photos = pet.photo_set.all()
+class DetailsPetView(DetailView):
+    model = Pet
+    template_name = 'pet-details-page.html'
+    slug_url_kwarg = 'pet_slug'
     comment_form = CommentForm()
-    context = {
-        'pet': pet,
-        'pet_photos': photos,
-        'comment_form': comment_form,
-        'photo_likes': photo_likes_count,
-        'photo_liked': user_already_liked_photo
-    }
 
-    return render(request, template_name='pet-details-page.html', context=context)
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['pet_photos'] = self.object.photo_set.all()
+        context['is_owner'] = self.object.user == self.request.user
+
+        return context
 
 
 def edit_pet(request, username, pet_slug):

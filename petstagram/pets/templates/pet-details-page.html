@@ -18,13 +18,16 @@
                         <!-- Pet Name -->
                         <p>{{ pet.name }}</p>
                         <!-- Pet Edit Button -->
-                        <a href="{% url 'pet edit' pet.name pet.slug %}">
-                            <img class="edit-img" src='{% static "/images/edit-pen-icon-6.jpg" %}' alt="edit button">
-                        </a>
-                        <!-- Pet Delete Button -->
-                        <a href="{% url 'pet delete' pet.name pet.slug %}">
-                            <img class="bin-img" src='{% static "/images/icon-remove-22.jpg" %}' alt="bin button">
-                        </a>
+                        {% if is_owner %}
+                            <a href="{% url 'pet edit' pet.name pet.slug %}">
+                                <img class="edit-img" src='{% static "/images/edit-pen-icon-6.jpg" %}'
+                                     alt="edit button">
+                            </a>
+                            <!-- Pet Delete Button -->
+                            <a href="{% url 'pet delete' pet.name pet.slug %}">
+                                <img class="bin-img" src='{% static "/images/icon-remove-22.jpg" %}' alt="bin button">
+                            </a>
+                        {% endif %}
                     </div>
                     <div class="data">
                         <!-- Pet Total Photos -->
@@ -46,7 +49,7 @@
                         <div class="top">
                             <!-- User Details and image location -->
                             <div class="userDetails">
-                                <a href="profile details">
+                                <a href="{% url 'account details' pk=photo.user_id %}">
                                     <div class="profilepic">
                                         <div class="profile_img">
                                             <div class="image">
@@ -56,9 +59,9 @@
                                     </div>
                                 </a>
                                 <h3>
-                                    <a href="profile details">
+                                    <a href="{% url 'account details' pk=photo.user_id %}">
                                         <!-- if user has first name and last name -->
-                                        Diyan Kalaydzhiev
+                                        {{ photo.user.profile.get_full_name }}
                                         <!-- else -->
                                         <!-- user username -->
                                     </a>
@@ -81,7 +84,7 @@
                                 <div class="left">
 								<span class="heart">
 									<a href="{% url 'like photo' photo.id %}">
-										{% if photo.photolike_set.all.count > 0 %}
+										{% if photo.likes.count > 0 %}
                                             <svg style="color: red"
                                                  xmlns="http://www.w3.org/2000/svg"
                                                  width="24"
@@ -140,7 +143,7 @@
                             <!-- -->
 
 
-                            <p class="likes">{{ photo.photolike_set.all.count }} likes</p>
+                            <p class="likes">{{ photo.likes.count }} likes</p>
 
 
                             <!-- tagged pets -->
@@ -158,32 +161,32 @@
                             </a>
 
                             <h5 class="postTime">{{ photo.date_of_publication }}</h5>
-                        {% for photo_comment in photo.photocomment_set.all %}
-                        <div class="comments">
-                        <div class="top">
-                            <div class="userDetails">
-                                <div class="comment-data">
-                                    <div class="profilepic">
-                                        <div class="profile_img">
-                                            <div class="image">
-                                                <!-- User Profile Image -->
-                                                <img src='{% static "/images/person.png" %}' alt="img8">
+                            {% for photo_comment in photo.photocomment_set.all %}
+                                <div class="comments">
+                                    <div class="top">
+                                        <div class="userDetails">
+                                            <div class="comment-data">
+                                                <div class="profilepic">
+                                                    <div class="profile_img">
+                                                        <div class="image">
+                                                            <!-- User Profile Image -->
+                                                            <img src='{% static "/images/person.png" %}' alt="img8">
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <p>
+                                                    <!-- Link to User Profile Details Page-->
+                                                    <!-- User First and/or Last Name or username-->
+                                                    <a href="">Steven Ivanov</a>
+                                                    <!-- User Comment -->
+                                                    {{ photo_comment.comment_text }}
+                                                </p>
                                             </div>
+                                            <span>{{ photo_comment.date_time_of_publication }}</span>
                                         </div>
                                     </div>
-                                    <p>
-                                        <!-- Link to User Profile Details Page-->
-                                        <!-- User First and/or Last Name or username-->
-                                        <a href="">Steven Ivanov</a>
-                                        <!-- User Comment -->
-                                        {{ photo_comment.comment_text }}
-                                    </p>
                                 </div>
-                                <span>{{ photo_comment.date_time_of_publication }}</span>
-                            </div>
-                        </div>
-                    </div>
-                    {% endfor %}
+                            {% endfor %}
                             <!-- add comments section -->
                             <div class="addComments">
                                 <div class="reaction">

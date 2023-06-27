@@ -1,5 +1,6 @@
 {% extends 'base.html' %}
 {% load static %}
+{% load get_user_fullname %}
 
 {% block content %}
     <div class="container">
@@ -19,22 +20,24 @@
                 <div class="top">
                     <div class="userDetails">
                         <!-- Link to User Profile Page -->
-                        <a href="#">
+                        <a href="{% url 'account details' photo.user.pk %}">
                             <div class="profilepic">
                                 <div class="profile_img">
                                     <div class="image">
-                                        <img src='{% static "/images/person.png" %}' alt="img8">
+                                        {% if photo.user.profile.profile_picture %}
+                                            <img src="{{ photo.user.profile.profile_picture }}" alt="">
+                                            {% else %}
+                                            <img src='{% static "/images/person.png" %}' alt="img8">
+                                        {% endif %}
                                     </div>
                                 </div>
                             </div>
                         </a>
                         <h3>
                             <!-- Link to User Profile Page -->
-                            <a href="{% url 'account details' pk=1 %}">
+                            <a href="{% url 'account details' photo.user.pk %}">
                                 <!-- if user has first name and last name -->
-                                Diyan Kalaydzhiev
-                                <!-- else -->
-                                <!-- show user username -->
+                                {{ photo.user_id|get_username_or_full_name }}
                             </a>
                             <br>
                             {% if photo.location %}
@@ -55,7 +58,7 @@
                             <!-- Start Like Button -->
                             <span class="heart">
 									<a href="{% url 'like photo' photo.id %}">
-										{% if photo.user_liked %}
+										{% if photo.id in liked_photos_by_user %}
                                             <svg style="color: red"
                                                  xmlns="http://www.w3.org/2000/svg"
                                                  width="24"
@@ -128,7 +131,8 @@
                     <!-- Link to First Tagged Pet Details Page-->
 
                     {% for pet in photo.tagged_pets.all %}
-                        <a href="{% url 'pet details' username='Test-username' pet_slug=pet.slug %}">
+                        <a href="{% url 'pet details' username=pet.user.username pet_slug=pet.slug %}">
+
                             <p class="message">
                                 <b>{{ pet.name }}</b>
                             </p>
