@@ -1,6 +1,7 @@
 from django import forms
 from django.contrib.auth import get_user_model, login, authenticate
 from django.contrib.auth.views import LoginView, LogoutView
+from django.core.paginator import Paginator
 from django.http import HttpResponseRedirect
 from django.shortcuts import render
 from django.urls import reverse_lazy
@@ -21,17 +22,26 @@ class ProfileDeleteView(DeleteView):
         return HttpResponseRedirect(self.success_url)
 
 
-
 class UserDetailsView(DetailView):
     template_name = 'profile-details-page.html'
     model = UserModel
 
     def get_context_data(self, **kwargs):
+        photos = self.object.photo_set.all()
+        paginator = Paginator(photos, 2)
+        page_number = self.request.GET.get('page') or 1
+        page_obj = paginator.get_page(page_number)
         context = super().get_context_data()
         total_likes_count = sum([p.likes.count() for p in self.object.photo_set.all()])
-        context['total_likes'] = total_likes_count
-        return context
 
+        context.update({
+            'total_likes_count': total_likes_count,
+            'paginator': paginator,
+            'page_number': page_number,
+            'page_obj': page_obj
+        })
+
+        return context
 
 
 class SignOutView(LogoutView):

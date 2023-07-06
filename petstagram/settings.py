@@ -141,3 +141,14 @@ MEDIA_ROOT = BASE_DIR/'media/'
 LOGIN_REDIRECT_URL = reverse_lazy('display home')
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 AUTH_USER_MODEL = 'accounts.PetstagramUser'
+
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+
+EMAIL_USE_TLS = True
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_HOST_USER = 'noreply.petstagram.cs@gmail.com'
+EMAIL_HOST_PASSWORD = 'qigintdngmpldmlr'
+EMAIL_PORT = 587
+
+DEFAULT_FROM_EMAIL = 'noreply.petstagram.cs@gmail.com'
+
