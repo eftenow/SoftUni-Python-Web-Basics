@@ -7,6 +7,7 @@ from django.db import models
 from petstagram.accounts.managers import AppUserManager
 from petstagram.accounts.validators import name_contains_only_letters
 
+
 # UserModel = get_user_model()
 
 
@@ -19,10 +20,6 @@ class PetstagramUser(AbstractBaseUser, PermissionsMixin):
     USERNAME_FIELD = "username"
 
     objects = AppUserManager()
-
-    # def delete(self, using=None, keep_parents=False):
-    #     self.profile.delete()
-    #     super().delete()
 
 
 class Profile(models.Model):

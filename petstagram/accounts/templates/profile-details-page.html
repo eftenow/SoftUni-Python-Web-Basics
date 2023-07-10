@@ -22,7 +22,7 @@
 
                     <!-- IF the viewer is the owner of the profile -->
                     <!-- Link to Edit Profile Page -->
-                    {% if object == request.user %}
+                    {% if is_owner %}
                         <a href="{% url 'account edit' user.pk %}">
                             <img class="edit-img" src='{% static "/images/edit-pen-icon-6.jpg" %}' alt="edit button">
                         </a>
@@ -64,7 +64,7 @@
         <!-- Start Pets Data Section -->
         <div class="pets">
             <div class="statuses">
-                {% for pet in object.pet_set.all %}
+                {% for pet in pets %}
                     <a href="{% url 'pet details' username=request.user.username pet_slug=pet.slug %}">
                         <div class="head-pet">
                             <div class="status">

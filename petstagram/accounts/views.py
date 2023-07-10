@@ -27,7 +27,9 @@ class UserDetailsView(DetailView):
     model = UserModel
 
     def get_context_data(self, **kwargs):
-        photos = self.object.photo_set.all()
+        is_owner = self.request.user == self.object
+        photos = self.object.photo_set.order_by('-date_of_publication').prefetch_related('user')
+        pets = self.object.pet_set.all()
         paginator = Paginator(photos, 2)
         page_number = self.request.GET.get('page') or 1
         page_obj = paginator.get_page(page_number)
@@ -38,7 +40,10 @@ class UserDetailsView(DetailView):
             'total_likes_count': total_likes_count,
             'paginator': paginator,
             'page_number': page_number,
-            'page_obj': page_obj
+            'page_obj': page_obj,
+            'is_owner': is_owner,
+            'pets': pets,
+            'photos': photos
         })
 
         return context
